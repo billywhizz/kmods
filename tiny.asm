@@ -1,8 +1,5 @@
 BITS 64
 
-	push rbp
-	mov rbp, rsp
-
 ; open /dev/null
 	lea rdi, [rel devnull]
 	mov rsi, 66     ; O_WRONLY | O_CREAT
@@ -32,22 +29,16 @@ BITS 64
 	mov rax, 1
 	syscall
 
-; close stdout
-	mov rax, 3     ; _NR_close
-	mov rdi, 3     ; fd from open - will always be 3
-	syscall
-
 ; exit
 	mov rax, 60
 	xor rdi, rdi
-	pop rbp
 	syscall
 
 ; globals
 section .data
-	msg db "Hello, World", 0xa
+	msg db "Hello, World"
 	msg_len equ $ - msg
-	msg2 db "Goodbye", 0xa
+	msg2 db "Goodbye"
 	msg2_len equ $ - msg2
-	devnull db "/dev/null", 0x0
+	devnull db "/dev/null"
 	devnull_len equ $ - devnull

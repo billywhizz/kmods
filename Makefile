@@ -1,16 +1,20 @@
 obj-m = comfile.o
 kver = $(shell uname -r)
 all:
+	${MAKE} uninstall
+	${MAKE} cleanall
 	${MAKE} comfile.ko
+	${MAKE} install
 	${MAKE} tiny.com
-comfile.ko:
+	${MAKE} disasm
+comfile.ko: comfile.c
 	make -C /lib/modules/$(kver)/build/ M=$(PWD) modules
-install:
+install: comfile.ko
 	sudo insmod comfile.ko
-uninstall:
+uninstall: comfile.ko
 	sudo rmmod comfile.ko
-disasm:
-	objdump -m i386:x86-64 -b binary --adjust-vma=0xabcd1000 -D tiny.com
+disasm: tiny.com
+	objdump -m i386:x86-64 -b binary -D tiny.com
 clean:
 	rm -f .*.cmd
 	rm -f *.mod
@@ -18,7 +22,7 @@ clean:
 	rm -f *.symvers
 	rm -f *.order
 	rm -f *.o
-tiny.com:
+tiny.com: tiny.asm
 	nasm -f bin -o tiny.com tiny.asm
 	chmod +x tiny.com
 cleanall:
